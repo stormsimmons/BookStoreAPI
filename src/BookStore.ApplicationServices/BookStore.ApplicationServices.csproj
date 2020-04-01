@@ -1,0 +1,20 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="AutoMapper" Version="9.0.0" />
+    <PackageReference Include="MediatR" Version="8.0.1" />
+    <PackageReference Include="WindowsAzure.Storage" Version="9.3.3" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\BookStore.DocumentParser\BookStore.DocumentParser.csproj" />
+    <ProjectReference Include="..\BookStore.Elasticsearch\BookStore.Elasticsearch.csproj" />
+    <ProjectReference Include="..\BookStore.Messaging\BookStore.Messaging.csproj" />
+    <ProjectReference Include="..\BookStore.ServiceModel\BookStore.ServiceModel.csproj" />
+  </ItemGroup>
+
+</Project>

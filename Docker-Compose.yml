@@ -1,0 +1,30 @@
+version: '3.7'
+
+services:
+    bookstoreapi:
+        image: bookstoreapi
+        environment:
+            - ASPNETCORE_ENVIRONMENT=DockerCompose
+        links: 
+            - "elasticsearch:db"
+            - "rabbitmq:messagequeue"
+        depends_on: 
+            - "elasticsearch"
+            - "rabbitmq"
+        restart: on-failure
+        ports: 
+            - "5000:80"
+
+    rabbitmq:
+        image: 'rabbitmq:3-management-alpine'
+        ports:
+            - "15672:15672"
+            - "5672:5672"
+
+    elasticsearch:
+        image: 'elasticsearch:7.5.0'
+        environment: 
+            - "discovery.type=single-node"
+        ports:
+            - "9200:9200"
+            - "9300:9300"
