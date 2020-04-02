@@ -13,16 +13,6 @@ namespace BookStore.ApplicationServices.Services
         {
         }
 
-        protected override string GetExchangeName()
-        {
-            return BookStoreMessagingConstants.BookStoreUpsertExchange;
-        }
-
-        protected override string GetQueueName()
-        {
-            return BookStoreMessagingConstants.BookStoreUpsertQueue;
-        }
-
         public async Task PublishMessage<T>(T message)
             where T : IMessage
         {

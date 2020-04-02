@@ -6,12 +6,11 @@ using System;
 
 namespace BookStore.ApplicationServices.Messages
 {
-    [RabbitMessage(BookStoreMessagingConstants.BookStoreUpsertExchange)]
-    public class BookUpsertMessage : IMessage
+    [RabbitMessage(BookStoreMessagingConstants.BookStoreUpsertedExchange)]
+    public class BookUpsertedMessage : IMessage
     {
         public Guid MessageId { get; set; } = Guid.NewGuid();
 
         public Book Book { get; set; }
-
     }
 }

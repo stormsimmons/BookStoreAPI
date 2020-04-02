@@ -2,7 +2,10 @@
 {
     public static class BookStoreMessagingConstants
     {
-        public static readonly string BookStoreUpsertExchange = "BookStoreUpsertExchange";
-        public static readonly string BookStoreUpsertQueue = "BookStoreUpsertQueue";
+        public const string BookStoreUpsertExchange = "BookStoreUpsertExchange";
+        public const string BookStoreUpsertedExchange = "BookStoreUpsertedExchange";
+        public const string BookStoreUpsertQueue = "BookStoreUpsertQueue";
+        public const string BookStoreUpsertedQueue = "BookStoreUpsertedQueue";
+
     }
 }

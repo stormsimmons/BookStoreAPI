@@ -1,7 +1,10 @@
-﻿using BookStore.Messaging.Interfaces;
+﻿using BookStore.Messaging.Attributes;
+using BookStore.Messaging.Interfaces;
 using Newtonsoft.Json;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
+using System.Linq;
+using System.Reflection;
 using System.Text;
 
 namespace BookStore.Messaging.Subscribers
@@ -50,9 +53,22 @@ namespace BookStore.Messaging.Subscribers
                 OnMessageRecieved(messageBody);
             }
         }
+        private string GetExchangeName()
+        {
+            var messageAttr = typeof(T)
+                .GetCustomAttributes()
+                .FirstOrDefault(x => x.GetType() == typeof(RabbitMessageAttribute))
+                as RabbitMessageAttribute;
+
+            if (messageAttr == null)
+            {
+                throw new CustomAttributeFormatException("RabbitMessageAttribute not implemented");
+            }
+
+            return messageAttr.ExchangeName;
+        }
 
         protected abstract string GetQueueName();
-        protected abstract string GetExchangeName();
 
         protected abstract void OnMessageRecieved(T message);
     }

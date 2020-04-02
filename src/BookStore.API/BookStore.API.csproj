@@ -21,6 +21,7 @@
     <ProjectReference Include="..\BookStore.Elasticsearch\BookStore.Elasticsearch.csproj" />
     <ProjectReference Include="..\BookStore.Messaging\BookStore.Messaging.csproj" />
     <ProjectReference Include="..\BookStore.ServiceModel\BookStore.ServiceModel.csproj" />
+    <ProjectReference Include="..\BookStore.SignalR\BookStore.SignalR.csproj" />
   </ItemGroup>
 
 

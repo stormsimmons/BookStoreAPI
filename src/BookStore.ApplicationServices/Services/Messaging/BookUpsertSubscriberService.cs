@@ -15,17 +15,15 @@ namespace BookStore.ApplicationServices.Services
         private readonly IBookRepository _bookRepository;
         private readonly IFileService _fileService;
         private readonly IPdfParser _pdfParser;
+        private readonly IMessageProducerService _messageProducerService;
 
-        public BookUpsertSubscriberService(IConnection connection, IBookRepository bookRepository, IFileService fileService, IPdfParser pdfParser) : base(connection)
+        public BookUpsertSubscriberService(IConnection connection, IBookRepository bookRepository,
+            IFileService fileService, IPdfParser pdfParser, IMessageProducerService messageProducerService) : base(connection)
         {
             _bookRepository = bookRepository;
             _fileService = fileService;
             _pdfParser = pdfParser;
-        }
-
-        protected override string GetExchangeName()
-        {
-            return BookStoreMessagingConstants.BookStoreUpsertExchange;
+            _messageProducerService = messageProducerService;
         }
 
         protected override string GetQueueName()
@@ -42,7 +40,10 @@ namespace BookStore.ApplicationServices.Services
             message.Book.ContentText = fileContent;
 
             await _bookRepository.Upsert<Book, BookCommandCriteria>(new BookCommandCriteria(message.Book));
-            //raise created event 
+            await _messageProducerService.PublishMessage(new BookUpsertedMessage
+            {
+                Book = message.Book
+            });
         }
     }
 }

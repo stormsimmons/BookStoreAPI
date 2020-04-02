@@ -3,6 +3,7 @@ using BookStore.API.Middleware;
 using BookStore.ApplicationServices.Handlers.Queries;
 using BookStore.ApplicationServices.Interfaces;
 using BookStore.ApplicationServices.Services;
+using BookStore.ApplicationServices.Services.Messaging;
 using BookStore.DocumentParser.Interfaces;
 using BookStore.DocumentParser.PdfParsers;
 using BookStore.Domain.Entities;
@@ -16,6 +17,7 @@ using BookStore.Elasticsearch.Repositories;
 using BookStore.Messaging.Connection;
 using BookStore.ServiceModel.Dtos;
 using BookStore.ServiceModel.Validation;
+using BookStore.SignalR.Hubs;
 using FluentValidation;
 using MediatR;
 using Microsoft.AspNetCore.Builder;
@@ -40,6 +42,21 @@ namespace BookStore.API
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+
+            services.AddCors(options =>
+            {
+                //TODO: Think about a more appropriate restriction policy
+                options.AddPolicy("CorsPolicy",
+                    builder =>
+                    {
+                        builder
+                            .AllowAnyOrigin()
+                            .AllowAnyMethod()
+                            .AllowAnyHeader()
+                            .DisallowCredentials();
+                    });
+            });
+
             services.AddControllers();
 
             services.AddAutoMapper(config =>
@@ -64,6 +81,8 @@ namespace BookStore.API
             services.AddRabbitMQ(Configuration["RabbitMq:Host"]);
             services.AddTransient<IMessageProducerService, MessageProducerService>();
             services.AddHostedService<BookUpsertSubscriberService>();
+            services.AddHostedService<BookUpsertedSubscriberService>();
+
 
             var elasticHosts = Configuration.GetSection("Elasticsearch:Hosts")
                 .AsEnumerable()
@@ -79,6 +98,8 @@ namespace BookStore.API
             services.AddTransient<IEnumerable<IElasticCommand>>(x => new List<IElasticCommand> {
             new UpsertBookCommand()
             });
+
+            services.AddSignalR();
 
             services.AddSwaggerGen(c =>
             {
@@ -97,6 +118,7 @@ namespace BookStore.API
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
+            app.UseCors("CorsPolicy");
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
@@ -113,6 +135,7 @@ namespace BookStore.API
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
+                endpoints.MapHub<NotificationHub>("/notification");
             });
 
 
