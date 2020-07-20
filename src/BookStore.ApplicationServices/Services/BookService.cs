@@ -1,4 +1,6 @@
-﻿using BookStore.ApplicationServices.Interfaces;
+﻿using BookStore.ApplicationServices.Extensions;
+using BookStore.ApplicationServices.Interfaces;
+using BookStore.Caching.Interfaces;
 using BookStore.ServiceModel.Dtos;
 using BookStore.ServiceModel.Requests;
 using MediatR;
@@ -12,22 +14,24 @@ namespace BookStore.ApplicationServices.Services
     {
         private readonly IMediator _mediator;
         private readonly IFileService _fileService;
+        private readonly ICacheService _cacheService;
 
-        public BookService(IMediator mediator, IFileService fileService)
+        public BookService(IMediator mediator, IFileService fileService, ICacheService cacheService)
         {
             _mediator = mediator;
             _fileService = fileService;
+            _cacheService = cacheService;
         }
 
         public async Task<IEnumerable<BookDto>> GetBooks(GetBooksRequest request)
         {
-            return await _mediator.Send(request);
+            return await _cacheService.OptimeseWithCache(request.GetUniqueHash(), async () => await _mediator.Send(request));
         }
 
         public async Task InsertBooks(UpsertBookRequest request, IFormFile file)
         {
 
-            var fileName = "testpdf";// file.GetHashCode().ToString();
+            var fileName = file.GetUniqueHash();
             request.Book.FileName = fileName;
             request.Book.ContentUrl = $"https://bookstorefilestorage.blob.core.windows.net/books/{fileName}";
 

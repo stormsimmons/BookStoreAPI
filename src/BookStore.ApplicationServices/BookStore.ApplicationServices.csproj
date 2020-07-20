@@ -11,6 +11,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\BookStore.Caching\BookStore.Caching.csproj" />
     <ProjectReference Include="..\BookStore.DocumentParser\BookStore.DocumentParser.csproj" />
     <ProjectReference Include="..\BookStore.Elasticsearch\BookStore.Elasticsearch.csproj" />
     <ProjectReference Include="..\BookStore.Messaging\BookStore.Messaging.csproj" />

@@ -4,6 +4,7 @@ using BookStore.ApplicationServices.Handlers.Queries;
 using BookStore.ApplicationServices.Interfaces;
 using BookStore.ApplicationServices.Services;
 using BookStore.ApplicationServices.Services.Messaging;
+using BookStore.Caching.IOC;
 using BookStore.DocumentParser.Interfaces;
 using BookStore.DocumentParser.PdfParsers;
 using BookStore.Domain.Entities;
@@ -27,7 +28,6 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using System.Collections.Generic;
 using System.Linq;
-
 namespace BookStore.API
 {
     public class Startup
@@ -74,7 +74,7 @@ namespace BookStore.API
             services.AddTransient<IElasticRepository, ElasticRepository>();
             services.AddTransient<IBookService, BookService>();
             services.AddTransient<IBookRepository, ElasticBookRepository>();
-            services.AddTransient<IFileService>(x => new BlobFileService("DefaultEndpointsProtocol=https;AccountName=bookstorefilestorage;AccountKey=buCc4sp4OQ9S76ojupUxLZh5qAqam7iqZL0qLRvxbrQaZ0qDJPeGvgZz79vNn0XfLGjiYrNjTnvLykquCgTGFQ==;EndpointSuffix=core.windows.net"));
+            services.AddTransient<IFileService>(x => new BlobFileService("UseDevelopmentStorage=true"));
             services.AddTransient<IPdfParser, PdfParser>();
 
 
@@ -100,6 +100,14 @@ namespace BookStore.API
             });
 
             services.AddSignalR();
+
+
+            var redisHosts = Configuration.GetSection("Redis:Hosts")
+                .AsEnumerable()
+                .Where(x => x.Value != null)
+                .Select(x => x.Value);
+
+            services.UseRedisCaching(redisHosts, uint.Parse(Configuration["Redis:Database"]));
 
             services.AddSwaggerGen(c =>
             {
