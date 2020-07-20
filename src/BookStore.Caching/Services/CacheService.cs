@@ -24,10 +24,9 @@ namespace BookStore.Caching.Services
             var result = await resultFunc();
 
             // Fire and forget
-            _cacheStore.GetSetAsync(cacheKey, result, hoursToLive);
+            _cacheStore.GetSetAsync(cacheKey, result, hoursToLive).ConfigureAwait(false);
 
             return result;
-
         }
 
     }
